@@ -11,13 +11,30 @@
     <h1>To Do List</h1>
 
     <div class="navbar">    
-
+        <button id="Projects">Projects</button>
+        <button id="addProject">Add Project</button>
+        <button id="addTodo">Add To Do</button>
     </div>
         
 
     <div class="container">
 
     </div>
+
+    <div id="modal-container" class="modal-container">
+        <!-- Modal content -->
+        <div class="modal-content">
+          <h2>Add Project</h2>
+          <form id="add-project-form">
+            <label for="project-title">Project Title:</label>
+            <input type="text" id="project-title" name="project-title">
+            <!-- <label for="project-description">Project Description:</label>
+            <textarea id="project-description" name="project-description"></textarea> -->
+            <button id="submit-btn">Submit</button>
+          </form>
+        </div>
+      </div>
+
 </body>
 
 </html>
