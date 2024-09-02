@@ -10,31 +10,48 @@
 <body>
     <h1>To Do List</h1>
 
-    <div class="navbar">    
+    <div class="navbar">
         <button id="Projects">Projects</button>
         <button id="addProject">Add Project</button>
         <button id="addTodo">Add To Do</button>
     </div>
-        
+
 
     <div class="container">
 
     </div>
 
-    <div id="modal-container" class="modal-container">
+    <div id="project-modal-container" class="modal-container">
         <!-- Modal content -->
         <div class="modal-content">
-          <h2>Add Project</h2>
-          <form id="add-project-form">
-            <label for="project-title">Project Title:</label>
-            <input type="text" id="project-title" name="project-title">
-            <!-- <label for="project-description">Project Description:</label>
+            <h2>Add Project</h2>
+            <form id="add-project-form">
+                <label for="project-title">Project Title:</label>
+                <input type="text" id="project-title" name="project-title">
+                <!-- <label for="project-description">Project Description:</label>
             <textarea id="project-description" name="project-description"></textarea> -->
-            <button id="submit-btn">Submit</button>
-          </form>
+                <button id="submit-project-btn">Submit</button>
+            </form>
         </div>
-      </div>
+    </div>
 
+    <div id="todo-modal-container" class="modal-container">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <h2>Add To Do</h2>
+            <form id="add-todo-form">
+                <label for="todo-title">To Do Title:</label>
+                <input type="text" id="todo-title" name="todo-title">
+                <label for="todo-description">To Do Description:</label>
+                <textarea id="todo-description" name="todo-description"></textarea>
+                <label for="todo-due-date">Due Date:</label>
+                <input type="date" id="todo-due-date" name="todo-due-date">
+                <label for="todo-priority">Priority:</label>
+                <input type="checkbox" id="todo-priority" name="todo-priority">
+                <button id="submit-todo-btn">Submit</button>
+            </form>
+        </div>
+    </div>
 </body>
 
 </html>

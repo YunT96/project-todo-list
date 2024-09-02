@@ -20,12 +20,14 @@ const dom = (() => {
     const projectsBtn = document.querySelector("#Projects");
     const addProjectBtn = document.querySelector("#addProject");
     const addTodoBtn = document.querySelector("#addTodo");
-    return { projectContainer, projectsBtn, addProjectBtn, addTodoBtn };
+    const projectModalContainer = document.getElementById('project-modal-container');
+    const todoModalContainer = document.getElementById('todo-modal-container');
+    return { projectContainer, projectsBtn, addProjectBtn, addTodoBtn, projectModalContainer, todoModalContainer };
 })();
 
 const setupEventListeners = () => {
-    // Add event listener to submit button
-    document.getElementById('submit-btn').addEventListener('click', (e) => {
+    // Add event listener to submit project button
+    document.getElementById('submit-project-btn').addEventListener('click', (e) => {
 
         // Prevent default form submission
         e.preventDefault();
@@ -41,22 +43,37 @@ const setupEventListeners = () => {
         renderProjects();
 
         // Close the modal
-        modalContainer.classList.remove('show');
+        dom.projectModalContainer.classList.remove('show');
 
         // Clear the text field
         document.getElementById('project-title').value = '';
     });
 
+    //Form button
+    document.getElementById('submit-todo-btn').addEventListener('click', (e) => {
+
+        // Prevent default form submission
+        e.preventDefault();
+
+        // Close the modal
+        dom.todoModalContainer.classList.remove('show');
+    });
+
     // Add event listener to close the modal when clicked outside
-    const modalContainer = document.getElementById('modal-container');
-    modalContainer.addEventListener('click', (e) => {
-        if (e.target === modalContainer) {
-            modalContainer.classList.remove('show');
+    dom.projectModalContainer.addEventListener('click', (e) => {
+        if (e.target === dom.projectModalContainer) {
+            dom.projectModalContainer.classList.remove('show');
+        }
+    });
+    dom.todoModalContainer.addEventListener('click', (e) => {
+        if (e.target === dom.todoModalContainer) {
+            dom.todoModalContainer.classList.remove('show');
         }
     });
 
-     // Add event listener to open the new project form
-     dom.addProjectBtn.addEventListener('click', () => {
+
+    // Add event listener to open the new project form
+    dom.addProjectBtn.addEventListener('click', () => {
         renderAddProjectForm();
     });
 
@@ -64,10 +81,18 @@ const setupEventListeners = () => {
     dom.projectsBtn.addEventListener('click', () => {
         renderProjects();
     });
+
+    dom.addTodoBtn.addEventListener('click', () => {
+        renderAddTodoForm();
+    });
 };
 
 const renderTodos = (project) => {
+    console.log("rendering todos");
     dom.projectContainer.innerHTML = "";
+
+    dom.addTodoBtn.classList.add("show");
+    dom.addProjectBtn.classList.remove("show");
 
     project.getAllTodos().forEach((todo) => {
         const todoElement = document.createElement('div');
@@ -85,6 +110,16 @@ const renderTodos = (project) => {
         const priorityElement = document.createElement('p');
         priorityElement.textContent = todo.priority ? "High" : "Low";
 
+        // Button to remove to do
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = "Remove";
+        removeBtn.addEventListener('click', () => {
+            project.removeTodo(todo);
+            renderTodos(project);
+        });
+
+
+        todoElement.appendChild(removeBtn);
         todoElement.appendChild(titleElement);
         todoElement.appendChild(descElement);
         todoElement.appendChild(dueElement);
@@ -94,27 +129,56 @@ const renderTodos = (project) => {
     });
 };
 
+const renderAddTodoForm = () => {
+    // Get the modal container
+
+    const addTodoModalContainer = document.getElementById('todo-modal-container');
+    addTodoModalContainer.classList.add('show');
+
+}
+
 const renderAddProjectForm = () => {
     // Get the modal container
-    const modalContainer = document.getElementById('modal-container');
+    // const modalContainer = document.getElementById('modal-container');
 
-    modalContainer.classList.add('show');
+    dom.projectModalContainer.classList.add('show');
 };
 
 
 const renderProjects = () => {
+    console.log("rendering projects");
     dom.projectContainer.innerHTML = "";
+    dom.addProjectBtn.classList.add("show");
+    dom.addTodoBtn.classList.remove("show");
 
     todoApp.getAllProjects().forEach((project) => {
+        const renderTodosHandler = () => {
+            renderTodos(project);
+        };
         const projectElement = document.createElement('button');
         projectElement.classList.add("project-card");
         projectElement.textContent = project.title;
 
-        projectElement.addEventListener("click", () => {
-            renderTodos(project);
-        });
+        projectElement.addEventListener("click", renderTodosHandler);
 
         dom.projectContainer.appendChild(projectElement);
+
+        //Add button to remove project and its todos
+        const removeBtn = document.createElement('button');
+        removeBtn.classList.add("remove-btn");
+        removeBtn.textContent = "Remove";
+        removeBtn.addEventListener('click', () => {
+            // Remove the todos
+            project.getAllTodos().forEach((todo) => {
+                project.removeTodo(todo);
+            });
+            // Remove the project
+            todoApp.removeProject(project);
+            projectElement.removeEventListener("click", renderTodosHandler);
+            projectElement.remove();
+            renderProjects();
+        });
+        projectElement.appendChild(removeBtn);
     });
 };
 

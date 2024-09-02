@@ -27,6 +27,9 @@ class TodoApp {
         this.projects.push(project);
     }
 
+    removeProject(project) {
+        this.projects = this.projects.filter((p) => p !== project);
+    }
     getAllProjects() {
         return this.projects;
     }
