@@ -7,8 +7,8 @@ import { TodoApp } from "./project";
 
 //For testing
 const todoApp = new TodoApp();
-const defaultProject = new Project("default");
-const defaultProject2 = new Project("default2");
+const defaultProject = new Project("default", 0);
+const defaultProject2 = new Project("default2", 1);
 todoApp.addProject(defaultProject);
 todoApp.addProject(defaultProject2);
 defaultProject.addTodo(new Todo("test1", "description", 29091996, true));
@@ -16,17 +16,21 @@ defaultProject.addTodo(new Todo("test2", "description", 29091996, false));
 
 
 const dom = (() => {
-    const projectContainer = document.querySelector(".container");
+    const container = document.querySelector(".container");
+    const projectContainer = document.querySelector(".project-container");
+    const projectTitle = document.querySelector(".project-title");
     const projectsBtn = document.querySelector("#Projects");
     const addProjectBtn = document.querySelector("#addProject");
+    const navbar = document.querySelector(".navbar");
     const addTodoBtn = document.querySelector("#addTodo");
     const projectModalContainer = document.getElementById('project-modal-container');
     const todoModalContainer = document.getElementById('todo-modal-container');
-    return { projectContainer, projectsBtn, addProjectBtn, addTodoBtn, projectModalContainer, todoModalContainer };
+    return { container, projectContainer, projectTitle, projectsBtn, addProjectBtn, navbar, addTodoBtn, projectModalContainer, todoModalContainer };
 })();
 
 const setupEventListeners = () => {
     // Add event listener to submit project button
+    let projectID = 2;
     document.getElementById('submit-project-btn').addEventListener('click', (e) => {
 
         // Prevent default form submission
@@ -34,7 +38,9 @@ const setupEventListeners = () => {
 
         // Get the title value from the text field and create a new project
         const title = document.getElementById('project-title').value;
-        const newProject = new Project(title);
+
+        const newProject = new Project(title, projectID);
+        projectID += 1;
 
         // Add the new project to the projects array
         todoApp.addProject(newProject);
@@ -49,7 +55,7 @@ const setupEventListeners = () => {
         document.getElementById('project-title').value = '';
     });
 
-    //Form button
+    //Event listener for to do submission
     document.getElementById('submit-todo-btn').addEventListener('click', (e) => {
 
         // Prevent default form submission
@@ -57,6 +63,22 @@ const setupEventListeners = () => {
 
         // Close the modal
         dom.todoModalContainer.classList.remove('show');
+
+        // Get value from form fields and create new to do
+        const title = document.getElementById('todo-title').value;
+        const description = document.getElementById('todo-description').value;
+        const dueDate = document.getElementById('todo-due-date').value;
+        const priority = document.getElementById('todo-priority').checked;
+        const newTodo = new Todo(title, description, dueDate, priority);
+        const activeProject = todoApp.getActiveProject();
+        activeProject.addTodo(newTodo);
+        renderTodos(activeProject);
+
+        // Clear the text fields
+        document.getElementById('todo-title').value = '';
+        document.getElementById('todo-description').value = '';
+        document.getElementById('todo-due-date').value = '';
+        document.getElementById('todo-priority').checked = false;
     });
 
     // Add event listener to close the modal when clicked outside
@@ -83,20 +105,42 @@ const setupEventListeners = () => {
     });
 
     dom.addTodoBtn.addEventListener('click', () => {
-        renderAddTodoForm();
+         renderAddTodoForm();
     });
 };
 
 const renderTodos = (project) => {
     console.log("rendering todos");
+    console.log(project);
+    dom.projectTitle.innerHTML = "";
     dom.projectContainer.innerHTML = "";
+
+    //Set active project
+    todoApp.setActiveProject(project);
+
+    // add to do button to the nav bar
+    // const addTodoBtn = document.createElement('button');
+    // addTodoBtn.textContent = "Add To Do";
+    // addTodoBtn.addEventListener('click', () => {
+    //     renderAddTodoForm(project);
+    // });
+    // dom.navbar.appendChild(addTodoBtn);
+    
 
     dom.addTodoBtn.classList.add("show");
     dom.addProjectBtn.classList.remove("show");
 
+    //add project title
+    const projectTitle = document.createElement('h1');
+    projectTitle.textContent = project.title;
+    dom.projectTitle.appendChild(projectTitle);
+    
+
     project.getAllTodos().forEach((todo) => {
+        
         const todoElement = document.createElement('div');
         todoElement.classList.add("todo-card");
+
 
         const titleElement = document.createElement('p');
         titleElement.textContent = todo.title;
@@ -119,13 +163,13 @@ const renderTodos = (project) => {
         });
 
 
-        todoElement.appendChild(removeBtn);
+        
         todoElement.appendChild(titleElement);
         todoElement.appendChild(descElement);
         todoElement.appendChild(dueElement);
         todoElement.appendChild(priorityElement);
         dom.projectContainer.appendChild(todoElement);
-
+        todoElement.appendChild(removeBtn);
     });
 };
 
@@ -134,6 +178,9 @@ const renderAddTodoForm = () => {
 
     const addTodoModalContainer = document.getElementById('todo-modal-container');
     addTodoModalContainer.classList.add('show');
+
+    let activeProject = todoApp.getActiveProject();
+    console.log(activeProject);
 
 }
 
@@ -149,6 +196,7 @@ const renderProjects = () => {
     console.log("rendering projects");
     dom.projectContainer.innerHTML = "";
     dom.addProjectBtn.classList.add("show");
+    dom.projectTitle.innerHTML = "";
     dom.addTodoBtn.classList.remove("show");
 
     todoApp.getAllProjects().forEach((project) => {

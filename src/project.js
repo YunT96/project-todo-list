@@ -1,7 +1,8 @@
 class Project { 
-    constructor(title) {
+    constructor(title, projectID) {
         this.title = title;
         this.todos = [];
+        this.projectID = projectID;
     }
 
     addTodo(todo) {
@@ -32,6 +33,15 @@ class TodoApp {
     }
     getAllProjects() {
         return this.projects;
+    }
+    getProjectByID (projectID) {
+        return this.projects[projectID];
+    }
+    setActiveProject(project) {
+        this.activeProject = project;
+    }
+    getActiveProject() {
+        return this.activeProject;
     }
 }
 
