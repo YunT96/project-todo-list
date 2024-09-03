@@ -53,6 +53,25 @@
             </form>
         </div>
     </div>
+    
+    <div id="edit-todo-modal-container" class="modal-container">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <h2>Edit To Do</h2>
+            <form id="edit-todo-form">
+                <label for="edit-todo-title">To Do Title:</label>
+                <input type="text" id="edit-todo-title" name="edit-todo-title">
+                <label for="edit-todo-description">To Do Description:</label>
+                <textarea id="edit-todo-description" name="edit-todo-description"></textarea>
+                <label for="edit-todo-due-date">Due Date:</label>
+                <input type="date" id="edit-todo-due-date" name="edit-todo-due-date">
+                <label for="edit-todo-priority">Priority:</label>
+                <input type="checkbox" id="edit-todo-priority" name="edit-todo-priority">
+                <button id="submit-edit-todo-btn">Submit</button>
+            </form>
+        </div>
+        
+    </div>
 </body>
 
 </html>

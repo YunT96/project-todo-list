@@ -11,10 +11,10 @@ const defaultProject = new Project("default", 0);
 const defaultProject2 = new Project("default2", 1);
 todoApp.addProject(defaultProject);
 todoApp.addProject(defaultProject2);
-defaultProject.addTodo(new Todo("test1", "description", 29091996, true));
+defaultProject.addTodo(new Todo("test1", "description lorem ipsum", 29091996, true));
 defaultProject.addTodo(new Todo("test2", "description", 29091996, false));
 
-
+//Get DOM elements
 const dom = (() => {
     const container = document.querySelector(".container");
     const projectContainer = document.querySelector(".project-container");
@@ -25,10 +25,12 @@ const dom = (() => {
     const addTodoBtn = document.querySelector("#addTodo");
     const projectModalContainer = document.getElementById('project-modal-container');
     const todoModalContainer = document.getElementById('todo-modal-container');
-    return { container, projectContainer, projectTitle, projectsBtn, addProjectBtn, navbar, addTodoBtn, projectModalContainer, todoModalContainer };
+    const editTodoModalContainer = document.getElementById('edit-todo-modal-container');
+    return { container, projectContainer, projectTitle, projectsBtn, addProjectBtn, navbar, addTodoBtn, projectModalContainer, todoModalContainer, editTodoModalContainer };
 })();
 
 const setupEventListeners = () => {
+
     // Add event listener to submit project button
     let projectID = 2;
     document.getElementById('submit-project-btn').addEventListener('click', (e) => {
@@ -81,6 +83,37 @@ const setupEventListeners = () => {
         document.getElementById('todo-priority').checked = false;
     });
 
+    // Add event listener for edit todo
+    document.getElementById('submit-edit-todo-btn').addEventListener('click', (e) => {
+
+        // Prevent default form submission
+        e.preventDefault();
+
+        // Close the modal
+        dom.editTodoModalContainer.classList.remove('show');
+
+        // Get value from form fields and overwrite current todo
+        const title = document.getElementById('edit-todo-title').value;
+        const description = document.getElementById('edit-todo-description').value;
+        const dueDate = document.getElementById('edit-todo-due-date').value;
+        const priority = document.getElementById('edit-todo-priority').checked;
+        const activeProject = todoApp.getActiveProject();
+
+        
+        const activeTodo = activeProject.getActiveTodo();
+
+        activeTodo.title = title;
+        activeTodo.description = description;
+        activeTodo.dueDate = dueDate;
+        activeTodo.priority = priority;
+        renderTodos(activeProject);
+
+        //make current to do inactive
+        activeTodo.setInactiveTodo();
+    });
+
+    
+
     // Add event listener to close the modal when clicked outside
     dom.projectModalContainer.addEventListener('click', (e) => {
         if (e.target === dom.projectModalContainer) {
@@ -92,7 +125,11 @@ const setupEventListeners = () => {
             dom.todoModalContainer.classList.remove('show');
         }
     });
-
+    dom.editTodoModalContainer.addEventListener('click', (e) => {
+        if (e.target === dom.editTodoModalContainer) {
+            dom.editTodoModalContainer.classList.remove('show');
+        }
+    });
 
     // Add event listener to open the new project form
     dom.addProjectBtn.addEventListener('click', () => {
@@ -117,16 +154,7 @@ const renderTodos = (project) => {
 
     //Set active project
     todoApp.setActiveProject(project);
-
-    // add to do button to the nav bar
-    // const addTodoBtn = document.createElement('button');
-    // addTodoBtn.textContent = "Add To Do";
-    // addTodoBtn.addEventListener('click', () => {
-    //     renderAddTodoForm(project);
-    // });
-    // dom.navbar.appendChild(addTodoBtn);
     
-
     dom.addTodoBtn.classList.add("show");
     dom.addProjectBtn.classList.remove("show");
 
@@ -135,12 +163,12 @@ const renderTodos = (project) => {
     projectTitle.textContent = project.title;
     dom.projectTitle.appendChild(projectTitle);
     
-
+    
+    //render todos
     project.getAllTodos().forEach((todo) => {
         
-        const todoElement = document.createElement('div');
+        const todoElement = document.createElement('button');
         todoElement.classList.add("todo-card");
-
 
         const titleElement = document.createElement('p');
         titleElement.textContent = todo.title;
@@ -162,6 +190,18 @@ const renderTodos = (project) => {
             renderTodos(project);
         });
 
+        // Button to edit to do
+        const editBtn = document.createElement('button');
+        editBtn.textContent = "Edit";
+        editBtn.addEventListener('click', () => {
+
+            //Select current todo
+            todoApp.setActiveProject(project);
+            todo.setActiveTodo();
+
+            renderEditTodoForm(todo);
+        });
+
 
         
         todoElement.appendChild(titleElement);
@@ -169,15 +209,15 @@ const renderTodos = (project) => {
         todoElement.appendChild(dueElement);
         todoElement.appendChild(priorityElement);
         dom.projectContainer.appendChild(todoElement);
+        todoElement.appendChild(editBtn);
         todoElement.appendChild(removeBtn);
+        
     });
 };
 
 const renderAddTodoForm = () => {
     // Get the modal container
-
-    const addTodoModalContainer = document.getElementById('todo-modal-container');
-    addTodoModalContainer.classList.add('show');
+    dom.todoModalContainer.classList.add('show');
 
     let activeProject = todoApp.getActiveProject();
     console.log(activeProject);
@@ -186,9 +226,18 @@ const renderAddTodoForm = () => {
 
 const renderAddProjectForm = () => {
     // Get the modal container
-    // const modalContainer = document.getElementById('modal-container');
-
     dom.projectModalContainer.classList.add('show');
+};
+
+const renderEditTodoForm = (todo) => {
+    // Get the modal container
+    dom.editTodoModalContainer.classList.add('show');
+
+    //get todo value
+    document.getElementById('edit-todo-title').value = todo.title;
+    document.getElementById('edit-todo-description').value = todo.description;
+    document.getElementById('edit-todo-due-date').value = todo.dueDate;
+    document.getElementById('edit-todo-priority').checked = todo.priority;
 };
 
 
@@ -203,7 +252,7 @@ const renderProjects = () => {
         const renderTodosHandler = () => {
             renderTodos(project);
         };
-        const projectElement = document.createElement('button');
+        const projectElement = document.createElement('div');
         projectElement.classList.add("project-card");
         projectElement.textContent = project.title;
 

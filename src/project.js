@@ -1,4 +1,6 @@
-class Project { 
+
+
+class Project {
     constructor(title, projectID) {
         this.title = title;
         this.todos = [];
@@ -16,7 +18,10 @@ class Project {
     getAllTodos() {
         return this.todos;
     }
-    
+    getActiveTodo() {
+        return this.todos.find(todo => todo.isActive);
+    }
+
 }
 
 class TodoApp {
@@ -34,7 +39,7 @@ class TodoApp {
     getAllProjects() {
         return this.projects;
     }
-    getProjectByID (projectID) {
+    getProjectByID(projectID) {
         return this.projects[projectID];
     }
     setActiveProject(project) {
@@ -43,6 +48,7 @@ class TodoApp {
     getActiveProject() {
         return this.activeProject;
     }
+
 }
 
 
