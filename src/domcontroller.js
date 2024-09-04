@@ -7,12 +7,14 @@ import { TodoApp } from "./project";
 
 //For testing
 const todoApp = new TodoApp();
-const defaultProject = new Project("default", 0);
-const defaultProject2 = new Project("default2", 1);
-todoApp.addProject(defaultProject);
-todoApp.addProject(defaultProject2);
-defaultProject.addTodo(new Todo("test1", "description lorem ipsum", 29091996, true));
-defaultProject.addTodo(new Todo("test2", "description", 29091996, false));
+todoApp.loadProjectsFromLocalStorage();
+
+// const defaultProject = new Project("default", 0);
+// const defaultProject2 = new Project("default2", 1);
+// todoApp.addProject(defaultProject);
+// todoApp.addProject(defaultProject2);
+// defaultProject.addTodo(new Todo("test1", "description lorem ipsum", 29091996, true));
+// defaultProject.addTodo(new Todo("test2", "description", 29091996, false));
 
 //Get DOM elements
 const dom = (() => {
@@ -32,7 +34,7 @@ const dom = (() => {
 const setupEventListeners = () => {
 
     // Add event listener to submit project button
-    let projectID = 2;
+    let projectID = 0;
     document.getElementById('submit-project-btn').addEventListener('click', (e) => {
 
         // Prevent default form submission
@@ -46,6 +48,7 @@ const setupEventListeners = () => {
 
         // Add the new project to the projects array
         todoApp.addProject(newProject);
+        todoApp.saveProjectsToLocalStorage();
 
         // Render the new project
         renderProjects();
@@ -74,7 +77,11 @@ const setupEventListeners = () => {
         const newTodo = new Todo(title, description, dueDate, priority);
         const activeProject = todoApp.getActiveProject();
         activeProject.addTodo(newTodo);
+         // Save to local storage
+        todoApp.saveProjectsToLocalStorage();
         renderTodos(activeProject);
+
+       
 
         // Clear the text fields
         document.getElementById('todo-title').value = '';
@@ -177,7 +184,11 @@ const renderTodos = (project) => {
         descElement.textContent = todo.description;
 
         const dueElement = document.createElement('p');
-        dueElement.textContent = new Date(todo.dueDate).toLocaleString();
+        dueElement.textContent = new Date(todo.dueDate).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
 
         const priorityElement = document.createElement('p');
         priorityElement.textContent = todo.priority ? "High" : "Low";
@@ -271,6 +282,7 @@ const renderProjects = () => {
             });
             // Remove the project
             todoApp.removeProject(project);
+            todoApp.saveProjectsToLocalStorage();
             projectElement.removeEventListener("click", renderTodosHandler);
             projectElement.remove();
             renderProjects();
