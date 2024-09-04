@@ -7,7 +7,6 @@ import { TodoApp } from "./project";
 
 //For testing
 const todoApp = new TodoApp();
-todoApp.loadProjectsFromLocalStorage();
 
 // const defaultProject = new Project("default", 0);
 // const defaultProject2 = new Project("default2", 1);
@@ -48,8 +47,7 @@ const setupEventListeners = () => {
 
         // Add the new project to the projects array
         todoApp.addProject(newProject);
-        todoApp.saveProjectsToLocalStorage();
-
+        todoApp.saveToLocalStorage();
         // Render the new project
         renderProjects();
 
@@ -77,8 +75,7 @@ const setupEventListeners = () => {
         const newTodo = new Todo(title, description, dueDate, priority);
         const activeProject = todoApp.getActiveProject();
         activeProject.addTodo(newTodo);
-         // Save to local storage
-        todoApp.saveProjectsToLocalStorage();
+        todoApp.saveToLocalStorage();
         renderTodos(activeProject);
 
        
@@ -198,6 +195,7 @@ const renderTodos = (project) => {
         removeBtn.textContent = "Remove";
         removeBtn.addEventListener('click', () => {
             project.removeTodo(todo);
+            todoApp.saveToLocalStorage();
             renderTodos(project);
         });
 
@@ -282,7 +280,7 @@ const renderProjects = () => {
             });
             // Remove the project
             todoApp.removeProject(project);
-            todoApp.saveProjectsToLocalStorage();
+            todoApp.saveToLocalStorage();
             projectElement.removeEventListener("click", renderTodosHandler);
             projectElement.remove();
             renderProjects();
@@ -292,6 +290,7 @@ const renderProjects = () => {
 };
 
 function init() {
+    todoApp.loadFromLocalStorage();
     setupEventListeners();
     renderProjects();
 }

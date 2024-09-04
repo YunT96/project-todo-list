@@ -1,4 +1,4 @@
-
+import { Todo } from "./todo.js";
 
 class Project {
     constructor(title, projectID, todos = []) {
@@ -48,23 +48,26 @@ class TodoApp {
     getActiveProject() {
         return this.activeProject;
     }
-    saveProjectsToLocalStorage() {
-        const projectsWithTodos = this.projects.map(project => {
-            return {
-                title: project.title,
-                projectID: project.projectID,
-                todos: project.todos
-            };
-        });
-        localStorage.setItem('projects', JSON.stringify(projectsWithTodos));
+    saveToLocalStorage() {
+        const serializedData = JSON.stringify(this);
+        localStorage.setItem('todoAppData', serializedData);
     }
 
-    loadProjectsFromLocalStorage() {
-        const storedProjects = localStorage.getItem('projects');
-        if (storedProjects) {
-            const projectsWithTodos = JSON.parse(storedProjects);
-            this.projects = projectsWithTodos.map(project => {
-                return new Project(project.title, project.projectID, project.todos);
+    loadFromLocalStorage() {
+        const serializedData = localStorage.getItem('todoAppData');
+        if (serializedData) {
+            const data = JSON.parse(serializedData);
+            this.projects = data.projects.map(projectData => {
+                const project = new Project(projectData.title, projectData.projectID);
+                project.todos = projectData.todos.map(todoData => {
+                    return new Todo(
+                        todoData.title,
+                        todoData.description,
+                        todoData.dueDate,
+                        todoData.priority
+                    );
+                });
+                return project;
             });
         }
     }
