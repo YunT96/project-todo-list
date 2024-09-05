@@ -1,5 +1,4 @@
-import "./styles.css";
-
-import { init } from "./domcontroller.js";
+import './styles.css';
+import { init } from './domcontroller';
 
 init();
